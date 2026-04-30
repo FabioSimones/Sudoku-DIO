@@ -4,32 +4,53 @@ import dev.fabiosimones.sudoku.model.Board;
 import dev.fabiosimones.sudoku.model.Difficulty;
 import dev.fabiosimones.sudoku.model.SudokuPuzzle;
 import dev.fabiosimones.sudoku.service.SudokuGenerator;
+import dev.fabiosimones.sudoku.service.SudokuService;
 import dev.fabiosimones.sudoku.service.SudokuValidator;
 import dev.fabiosimones.sudoku.ui.ConsoleUI;
 
 public class Main {
     public static void main(String[] args) {
-        SudokuGenerator generator = new SudokuGenerator();
-        SudokuValidator validator = new SudokuValidator();
+        SudokuService sudokuService = new SudokuService();
 
-        SudokuPuzzle puzzle = generator.generate(Difficulty.EASY);
-        Board board = new Board(puzzle.getInitialBoard());
+        sudokuService.startNewGame(Difficulty.EASY);
 
-        printBoard(board.toMatrix());
+        System.out.println("Dificuldade: " + sudokuService.getCurrentDifficulty().getDescription());
 
-        int testRow = 2;
-        int testCol = 4;
-        int testNumber = 5;
+        System.out.println("\nTabuleiro inicial:");
+        printBoard(sudokuService.getCurrentBoard());
 
-        try {
-            validator.validateMove(board, testRow, testCol, testNumber);
-            board.setValue(testRow, testCol, testNumber);
-            System.out.println("Jogada realizada com sucesso!");
-        } catch (IllegalArgumentException | IllegalStateException exception) {
-            System.out.println("Erro: " + exception.getMessage());
+        playFirstCorrectMove(sudokuService);
+
+        System.out.println("\nTabuleiro após uma jogada:");
+        printBoard(sudokuService.getCurrentBoard());
+
+        System.out.println("\nStatus: " + sudokuService.getGameStatus());
+    }
+
+    private static void playFirstCorrectMove(SudokuService sudokuService) {
+        int[][] currentBoard = sudokuService.getCurrentBoard();
+        int[][] solutionBoard = sudokuService.getSolutionBoard();
+
+        for (int row = 0; row < Board.SIZE; row++) {
+            for (int col = 0; col < Board.SIZE; col++) {
+                if (currentBoard[row][col] == 0) {
+                    int correctNumber = solutionBoard[row][col];
+
+                    try {
+                        sudokuService.makeMove(row, col, correctNumber);
+
+                        System.out.println("\nJogada realizada com sucesso!");
+                        System.out.println("Linha: " + (row + 1));
+                        System.out.println("Coluna: " + (col + 1));
+                        System.out.println("Número: " + correctNumber);
+                    } catch (IllegalArgumentException | IllegalStateException exception) {
+                        System.out.println("\nErro: " + exception.getMessage());
+                    }
+
+                    return;
+                }
+            }
         }
-
-        System.out.println("Sudoku resolvido? " + validator.isSolved(board, puzzle.getSolutionBoard()));
     }
 
     private static void printBoard(int[][] board) {
