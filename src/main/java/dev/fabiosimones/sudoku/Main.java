@@ -1,27 +1,44 @@
 package dev.fabiosimones.sudoku;
 
 import dev.fabiosimones.sudoku.model.Board;
+import dev.fabiosimones.sudoku.model.Difficulty;
+import dev.fabiosimones.sudoku.model.SudokuPuzzle;
+import dev.fabiosimones.sudoku.service.SudokuGenerator;
 import dev.fabiosimones.sudoku.ui.ConsoleUI;
 
 public class Main {
     public static void main(String[] args) {
-        int[][] initialBoard = {
-                {5, 3, 0, 0, 7, 0, 0, 0, 0},
-                {6, 0, 0, 1, 9, 5, 0, 0, 0},
-                {0, 9, 8, 0, 0, 0, 0, 6, 0},
-                {8, 0, 0, 0, 6, 0, 0, 0, 3},
-                {4, 0, 0, 8, 0, 3, 0, 0, 1},
-                {7, 0, 0, 0, 2, 0, 0, 0, 6},
-                {0, 6, 0, 0, 0, 0, 2, 8, 0},
-                {0, 0, 0, 4, 1, 9, 0, 0, 5},
-                {0, 0, 0, 0, 8, 0, 0, 7, 9}
-        };
+        SudokuGenerator generator = new SudokuGenerator();
 
-        Board board = new Board(initialBoard);
+        SudokuPuzzle puzzle = generator.generate(Difficulty.MEDIUM);
 
-        System.out.println("Tabuleiro criado com sucesso!");
-        System.out.println("Valor da posição [0][0]: " + board.getValue(0, 0));
-        System.out.println("A posição [0][0] é fixa? " + board.isFixed(0, 0));
-        System.out.println("A posição [0][2] está vazia? " + board.isEmpty(0, 2));
+        System.out.println("Dificuldade: " + puzzle.getDifficulty().getDescription());
+
+        System.out.println("\nTabuleiro inicial:");
+        printBoard(puzzle.getInitialBoard());
+
+        System.out.println("\nSolução:");
+        printBoard(puzzle.getSolutionBoard());
+    }
+
+    private static void printBoard(int[][] board) {
+        for (int row = 0; row < board.length; row++) {
+            if (row % 3 == 0) {
+                System.out.println("+-------+-------+-------+");
+            }
+
+            for (int col = 0; col < board[row].length; col++) {
+                if (col % 3 == 0) {
+                    System.out.print("| ");
+                }
+
+                int value = board[row][col];
+                System.out.print(value == 0 ? ". " : value + " ");
+            }
+
+            System.out.println("|");
+        }
+
+        System.out.println("+-------+-------+-------+");
     }
 }
